@@ -1,4 +1,7 @@
-/software/
+/software/*
+!/software/hyperfine/
+!/software/hyperfine/bin/
+!/software/hyperfine/bin/hyperfine
 /results/
 /data/
 /src/cargo-home/

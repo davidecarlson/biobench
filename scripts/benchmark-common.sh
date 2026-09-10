@@ -11,8 +11,9 @@ WARMUP=${WARMUP:-1}
 RUNS=${RUNS:-3}
 
 ensure_hyperfine() {
-    command -v hyperfine >/dev/null 2>&1 && return
-    "$ROOT/scripts/install-hyperfine.sh"
+    if [ ! -x "$SOFTWARE/hyperfine/bin/hyperfine" ]; then
+        "$ROOT/scripts/install-hyperfine.sh"
+    fi
     export PATH="$SOFTWARE/hyperfine/bin:$PATH"
     command -v hyperfine >/dev/null 2>&1 || { echo "hyperfine installation failed" >&2; return 1; }
 }
