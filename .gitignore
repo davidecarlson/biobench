@@ -5,7 +5,5 @@
 /src/rust-downloads/
 /src/rustup-init
 /src/rustup-init.sha256
-/src/*.tar.*
-/src/*.sha256
 /src/*.crate
 /src/*.part
