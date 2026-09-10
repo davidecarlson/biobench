@@ -66,12 +66,17 @@ rebuild behavior.
 Each application has a direct runner and a Slurm wrapper in `scripts/`:
 
 ```bash
-THREADS=8,16,32,64,96,128,160,192 ./scripts/benchmark-minimap2.sh
-THREADS=8,16,32,64,96,128,160,192 sbatch scripts/benchmark-minimap2.slurm
+MAX_THREADS=192 ./scripts/benchmark-minimap2.sh
+MAX_THREADS=192 sbatch scripts/benchmark-minimap2.slurm
+# Optional scaling sequence: 1,2,4,8,16,24,...,MAX_THREADS
+THREAD_MODE=scaling MAX_THREADS=64 ./scripts/benchmark-minimap2.sh
 ```
 
-The default thread list is 8 through 192. Set `THREADS`, `ARCH`, `RUNS`,
-`WARMUP`, `RESULTS_DIR`, or `BENCH_WORK` in the environment. Results are JSON
+The default sequence starts at 8 threads and increases by 8 through
+`MAX_THREADS` (192 by default). Set `THREAD_MODE=scaling` to use 1, 2, 4, then
+8-thread increments. You can set `THREADS` to a comma-separated list as an
+advanced override. Set `ARCH`, `RUNS`, `WARMUP`, `RESULTS_DIR`, or `BENCH_WORK`
+as needed. Results are JSON
 and Markdown files under `results/APP/ARCH/`; reusable indexes are under
 `results/work/`. Hyperfine is used from `PATH`, or installed with
 `scripts/install-hyperfine.sh` under `software/hyperfine`. Adjust the Slurm

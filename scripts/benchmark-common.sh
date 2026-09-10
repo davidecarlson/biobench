@@ -6,9 +6,33 @@ ARCH=${ARCH:-native}
 SOFTWARE=${SOFTWARE:-$ROOT/software}
 DATA=${DATA:-$ROOT/data}
 RESULTS_DIR=${RESULTS_DIR:-$ROOT/results}
-THREADS=${THREADS:-8,16,32,64,96,128,160,192}
+MAX_THREADS=${MAX_THREADS:-192}
+THREAD_MODE=${THREAD_MODE:-linear}
 WARMUP=${WARMUP:-1}
 RUNS=${RUNS:-3}
+
+if [ -z "${THREADS:-}" ]; then
+    THREADS_LIST=()
+    if [ "$THREAD_MODE" = scaling ]; then
+        for value in 1 2 4; do
+            [ "$value" -le "$MAX_THREADS" ] && THREADS_LIST+=("$value")
+        done
+        next=8
+    elif [ "$THREAD_MODE" = linear ]; then
+        next=8
+    else
+        echo "THREAD_MODE must be linear or scaling" >&2
+        exit 2
+    fi
+    while [ "$next" -le "$MAX_THREADS" ]; do
+        THREADS_LIST+=("$next")
+        next=$((next + 8))
+    done
+    if [ "${#THREADS_LIST[@]}" -eq 0 ] || [ "${THREADS_LIST[${#THREADS_LIST[@]}-1]}" -ne "$MAX_THREADS" ]; then
+        THREADS_LIST+=("$MAX_THREADS")
+    fi
+    THREADS=$(IFS=,; printf '%s' "${THREADS_LIST[*]}")
+fi
 
 ensure_hyperfine() {
     if [ ! -x "$SOFTWARE/hyperfine/bin/hyperfine" ]; then
