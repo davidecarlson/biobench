@@ -10,6 +10,13 @@ See the [repository README](../README.md) for the quick start and dataset layout
 - `smoke-test.sh`: functional checks of all five installed applications.
 - `common.sh`, `dependencies.sh`: shared helpers sourced by the entry points.
 
+Benchmark runners are named `benchmark-APP.sh`; matching `.slurm` files submit
+the same runner through Slurm. They use Hyperfine with a default thread list
+of `8,16,32,64,96,128,160,192`. Override `THREADS`, `ARCH`, `RUNS`,
+`WARMUP`, `RESULTS_DIR`, or `BENCH_WORK`. `install-hyperfine.sh` installs
+Hyperfine 1.19.0 with Cargo when it is not already on `PATH`. Timing results
+are written as JSON and Markdown under `results/`.
+
 Scripts run directly, without a scheduler. Source archives are read from `src`
 relative to the repository, regardless of the caller's working directory.
 

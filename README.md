@@ -2,9 +2,8 @@
 
 This repository prepares optimized builds of bioinformatics applications and
 holds inputs for benchmarking read alignment, sequence search, RNA-seq
-quantification, and BAM/CRAM processing. It currently provides build and
-functional-validation scripts; it does not yet provide a benchmark timing or
-results-analysis harness.
+quantification, and BAM/CRAM processing. It provides build, validation, and
+Hyperfine timing scripts.
 
 ## Applications
 
@@ -63,6 +62,22 @@ setup requires network access.
 
 See [build details](scripts/README.md) for dependency versions, overrides and
 rebuild behavior.
+
+## Benchmark
+
+Each application has a direct runner and a Slurm wrapper in `scripts/`:
+
+```bash
+THREADS=8,16,32,64,96,128,160,192 ./scripts/benchmark-minimap2.sh
+THREADS=8,16,32,64,96,128,160,192 sbatch scripts/benchmark-minimap2.slurm
+```
+
+The default thread list is 8 through 192. Set `THREADS`, `ARCH`, `RUNS`,
+`WARMUP`, `RESULTS_DIR`, or `BENCH_WORK` in the environment. Results are JSON
+and Markdown files under `results/APP/ARCH/`; reusable indexes are under
+`results/work/`. Hyperfine is used from `PATH`, or installed with
+`scripts/install-hyperfine.sh` under `software/hyperfine`. Adjust the Slurm
+resource directives for the target cluster.
 
 ## Repository layout
 
