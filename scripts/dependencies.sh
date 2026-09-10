@@ -46,6 +46,17 @@ build_dependencies() {
 }
 
 setup_rust() {
+    local rust_mode=${RUST_MODE:-auto}
+    if [[ ${RUST_SYSTEM:-0} == 1 || ( $rust_mode == auto && $(command -v cargo 2>/dev/null || true) && $(command -v rustc 2>/dev/null || true) && ! -x $SOFTWARE/rustup/toolchains/${RUST_TOOLCHAIN:-stable}-x86_64-unknown-linux-gnu/bin/rustc ) ]]; then
+        command -v cargo >/dev/null 2>&1 && command -v rustc >/dev/null 2>&1 || {
+            echo 'RUST_SYSTEM=1 requires cargo and rustc on PATH' >&2; return 1;
+        }
+        echo "Using system/module Rust: $(rustc --version)"
+        return 0
+    fi
+    [[ $rust_mode == private || $rust_mode == auto ]] || {
+        echo 'RUST_MODE must be auto or private' >&2; return 2;
+    }
     # Keep the user's existing Rust installation untouched; all downloaded
     # registry/git dependencies and rustup downloads live beneath src.
     export CARGO_HOME="$SRC/cargo-home"
@@ -62,4 +73,12 @@ setup_rust() {
         rustup toolchain install "${RUST_TOOLCHAIN:-stable}" --profile minimal
     fi
     export RUSTUP_TOOLCHAIN=${RUST_TOOLCHAIN:-stable}
+}
+
+cargo_fetch() {
+    if [[ ${RUST_OFFLINE:-0} == 1 ]]; then
+        cargo fetch --locked --offline --target x86_64-unknown-linux-gnu
+    else
+        cargo fetch --locked --target x86_64-unknown-linux-gnu
+    fi
 }

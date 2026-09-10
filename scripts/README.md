@@ -45,6 +45,12 @@ live under `src`; installed toolchains live under `software/rustup`. Existing
 private toolchains are reused, and new installations download the requested Rust
 release. The scripts leave the system Rust installation unchanged.
 
+On systems without access to Rust's download servers, copy a compatible Rust
+toolchain and its Cargo cache onto the system, then run Salmon with
+`RUST_SYSTEM=1 RUST_OFFLINE=1 CARGO_HOME=/path/to/cargo-home`. `RUST_MODE=auto`
+uses a system or module Rust installation when the private toolchain is absent.
+The copied Cargo cache must contain every locked package required by Salmon.
+
 ## Downloaded dependencies
 
 | Dependency | Pinned source |

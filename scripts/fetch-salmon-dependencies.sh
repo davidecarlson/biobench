@@ -8,4 +8,4 @@ setup_rust
 work=$(mktemp -d "$BUILD/salmon-fetch.XXXXXX")
 extract salmon-2.7.0.tar.gz "$work"
 cd "$work"
-cargo fetch --locked --target x86_64-unknown-linux-gnu
+cargo_fetch

@@ -56,7 +56,10 @@ and development libraries for zlib, bzip2, xz/liblzma, OpenSSL, and ncurses.
 The scripts download missing libcurl, libdeflate, and SQLite sources into `src`
 and build them under `software/deps/ARCH`. They also install Salmon's private
 Rust toolchain and fetch its locked Cargo dependencies. The first build needs
-network access.
+network access. If Rust downloads are blocked, copy a compatible Rust
+installation and Cargo cache onto the host and set
+`RUST_SYSTEM=1 RUST_OFFLINE=1 CARGO_HOME=...` for the Salmon build. See the
+build-script reference for the required cache contents.
 
 See [build details](scripts/README.md) for dependency versions, overrides and
 rebuild behavior.

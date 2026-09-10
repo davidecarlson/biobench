@@ -82,7 +82,7 @@ case $app in
         # Rust uses LLVM LTO; GCC LTO objects cannot be consumed by Rust's linker.
         export CFLAGS="${CFLAGS//-flto=$JOBS/}" CXXFLAGS="${CXXFLAGS//-flto=$JOBS/}"
         export CARGO_TARGET_DIR="$work/target"
-        (cd "$work" && cargo fetch --locked --target x86_64-unknown-linux-gnu && cargo build --release --locked --offline -j "$JOBS" -p salmon-cli)
+        (cd "$work" && cargo_fetch && cargo build --release --locked --offline -j "$JOBS" -p salmon-cli)
         install -m755 "$work/target/release/salmon" "$prefix/bin/"
         { rustc --version; cargo --version; printf 'RUSTFLAGS=%s\nNative CFLAGS=%s\n' "$RUSTFLAGS" "$CFLAGS"; sha256sum "$work/Cargo.lock"; } >> "$prefix/build-info.txt"
         "$prefix/bin/salmon" --version
