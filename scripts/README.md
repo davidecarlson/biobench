@@ -59,7 +59,9 @@ archives. Existing dependency installations are reused. Remove the relevant
 optimization settings. Install any system development packages reported by the
 checks when moving to another system.
 
-SAMtools builds its bundled HTSlib with libcurl and libdeflate. Minibwa's bundled
+The curl dependency disables symbol hiding because some newer binutils toolchains
+produce an empty libtool symbol pipeline otherwise. SAMtools builds its bundled
+HTSlib with libcurl and libdeflate. Minibwa's bundled
 mimalloc is explicitly compiled with the selected optimization flags because its
 Makefile otherwise hard-codes that object's flags. BLAST uses its bundled LMDB
 (`--without-lmdb` selects the internal copy), the toolkit's `AR="gcc-ar cr"`

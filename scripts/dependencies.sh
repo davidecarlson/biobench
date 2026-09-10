@@ -40,7 +40,8 @@ build_dependencies() {
         (cd "$work" && ./configure --prefix="$DEPS" --libdir="$DEPS/lib" \
             --with-openssl --with-zlib --without-libpsl --without-libidn2 \
             --without-brotli --without-zstd --without-nghttp2 --without-libssh2 \
-            --disable-ldap --disable-ldaps --disable-docs && make -j "$JOBS" && make install)
+            --disable-ldap --disable-ldaps --disable-docs --disable-symbol-hiding &&
+            make -j "$JOBS" && make install)
     fi
 }
 
