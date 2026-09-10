@@ -17,7 +17,7 @@ Hyperfine timing scripts.
 
 ## Build
 
-Run directly on a Linux x86-64 machine with sufficient CPU, RAM and storage:
+Run on a Linux x86-64 machine with enough CPU, RAM, and storage:
 
 ```bash
 ./scripts/build.sh all
@@ -27,19 +27,18 @@ Run directly on a Linux x86-64 machine with sufficient CPU, RAM and storage:
 JOBS=32 ARCH=skylake-avx512 ./scripts/build.sh all
 ```
 
-No Slurm submission is required or performed. `JOBS` defaults to 8 and `ARCH`
-defaults to `native`. `native` targets the machine performing the build; use an
-explicit architecture when building for a different benchmark machine. Examples
-include `znver3` for AMD EPYC Milan and `skylake-avx512` for compatible Intel
-Xeon processors. Executables require a CPU supporting their compiled instruction
-set.
+The build runs in the current shell. `JOBS` defaults to 8 and `ARCH` defaults to
+`native`, which targets the current machine. Use an explicit architecture when
+building for another benchmark machine. Examples include `znver3` for AMD EPYC
+Milan and `skylake-avx512` for compatible Intel Xeon processors. The target CPU
+must support the selected instruction set.
 
-The scripts choose the newest available versioned GCC module, unless GCC on
-PATH is newer. GCC 13.2.0 was available during validation. Set
+The scripts choose the newest versioned GCC module unless GCC on `PATH` is
+newer. GCC 13.2.0 was available during validation. Set
 `GCC_MODULE=gcc/13.2.0` to pin the module. Systems without modules use GCC/G++
 from PATH.
 
-Default optimization is `-O3 -march=$ARCH -mtune=$ARCH -flto=$JOBS`.
+The default optimization flags are `-O3 -march=$ARCH -mtune=$ARCH -flto=$JOBS`.
 `LTO=0` disables GCC link-time optimization; `FAST_MATH=1` explicitly enables
 floating-point transformations that can alter numerical results. Fast-math is
 off by default. Salmon uses its Rust release profile with optimization level 3,
@@ -53,12 +52,11 @@ BUILD_ROOT=/fast/local/biobench JOBS=32 ./scripts/build.sh all
 ```
 
 Build prerequisites include Bash, GNU make, GCC/G++, Python 3, CMake, curl, tar,
-and the development libraries for zlib, bzip2, xz/liblzma, OpenSSL and ncurses
-already available on this system. Missing libcurl, libdeflate and SQLite are
-downloaded into `src` and built under `software/deps/ARCH`. Salmon's private Rust
-toolchain and locked Cargo dependencies are also installed/downloaded by the
-scripts, without changing the user's existing Rust installation. First-time
-setup requires network access.
+and development libraries for zlib, bzip2, xz/liblzma, OpenSSL, and ncurses.
+The scripts download missing libcurl, libdeflate, and SQLite sources into `src`
+and build them under `software/deps/ARCH`. They also install Salmon's private
+Rust toolchain and fetch its locked Cargo dependencies. The first build needs
+network access.
 
 See [build details](scripts/README.md) for dependency versions, overrides and
 rebuild behavior.
@@ -98,9 +96,9 @@ tree. Changing ARCH creates a separate installation; changing flags under the
 same ARCH replaces that application's installed binary. Do not concurrently
 build the same application or dependency prefix.
 
-The supplied source archives, datasets, installed software and dependency caches
-are local inputs/artifacts, not part of the build-script commit. Preserve the
-archives in `src` when cleaning intermediate build trees.
+The supplied source archives, datasets, installed software, and dependency
+caches stay local. Git tracks the build scripts and documentation. Preserve the
+archives in `src` when removing intermediate build trees.
 
 ## Benchmark inputs
 
@@ -109,9 +107,9 @@ archives in `src` when cleaning intermediate build trees.
 - `data/bam/`: HG002 PacBio CCS alignments.
 - `data/blast/`: GENCODE v46 transcript and protein sequence subsets.
 
-Inputs are supplied separately. Reference indexes and BLAST/Salmon databases
-must be generated with the appropriate application before timing workloads.
-The smoke tests use small synthetic inputs and do not modify these datasets.
+Inputs are supplied separately. Generate reference indexes and BLAST/Salmon
+databases with the relevant application before timing workloads. The smoke tests
+use small synthetic inputs and leave these datasets unchanged.
 
 ## Validate
 
@@ -126,6 +124,6 @@ validation, BLAST database creation/search, and Salmon indexing/quantification.
 Synthetic inputs and results remain in `software/smoke.*`. SAMtools also runs
 its upstream test suite during its build.
 
-For repeatable benchmarks, record input checksums, command lines, thread counts,
-CPU model, application version, and build settings. Each installed application's
-`build-info.txt` records its source checksum, compiler, flags and CPU details.
+Record input checksums, command lines, thread counts, CPU model, application
+version, and build settings with benchmark results. Each installation includes
+these build details in `build-info.txt`.
