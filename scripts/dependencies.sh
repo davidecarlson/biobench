@@ -47,10 +47,15 @@ build_dependencies() {
 
 setup_rust() {
     local rust_mode=${RUST_MODE:-auto}
-    if [[ ${RUST_SYSTEM:-0} == 1 || ( $rust_mode == auto && $(command -v cargo 2>/dev/null || true) && $(command -v rustc 2>/dev/null || true) && ! -x $SOFTWARE/rustup/toolchains/${RUST_TOOLCHAIN:-stable}-x86_64-unknown-linux-gnu/bin/rustc ) ]]; then
-        command -v cargo >/dev/null 2>&1 && command -v rustc >/dev/null 2>&1 || {
+    if [[ ${RUST_SYSTEM:-0} == 1 ]]; then
+        command -v cargo >/dev/null 2>&1 && command -v rustc >/dev/null 2>&1 &&
+            cargo --version >/dev/null 2>&1 && rustc --version >/dev/null 2>&1 || {
             echo 'RUST_SYSTEM=1 requires cargo and rustc on PATH' >&2; return 1;
         }
+        echo "Using system/module Rust: $(rustc --version)"
+        return 0
+    fi
+    if [[ $rust_mode == auto ]] && command -v cargo >/dev/null 2>&1 && command -v rustc >/dev/null 2>&1 && cargo --version >/dev/null 2>&1 && rustc --version >/dev/null 2>&1 && [[ ! -x $SOFTWARE/rustup/toolchains/${RUST_TOOLCHAIN:-stable}-x86_64-unknown-linux-gnu/bin/rustc ]]; then
         echo "Using system/module Rust: $(rustc --version)"
         return 0
     fi
