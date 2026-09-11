@@ -4,19 +4,19 @@ set -Eeuo pipefail
 # Flags intentionally undergo word splitting, with glob expansion disabled.
 set -f
 if [[ ${1:-} == --help || $# == 0 ]]; then
-    echo 'Usage: scripts/build.sh {all|deps|minibwa|minimap2|samtools|blast|salmon}'
+    echo 'Usage: scripts/build.sh {all|deps|minibwa|minimap2|samtools|blast|salmon|star}'
     echo 'Environment: ARCH=native JOBS=8 LTO=1 FAST_MATH=0 GCC_MODULE=gcc/13.2.0'
     exit 0
 fi
 app=$1
-case $app in all|deps|minibwa|minimap2|samtools|blast|salmon) ;; *) echo "Unknown application: $app" >&2; exit 2;; esac
+case $app in all|deps|minibwa|minimap2|samtools|blast|salmon|star) ;; *) echo "Unknown application: $app" >&2; exit 2;; esac
 source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 source "$ROOT/scripts/dependencies.sh"
 exec > >(tee "$SOFTWARE/logs/$app-$(date +%Y%m%dT%H%M%S)-$$.log") 2>&1
 trap 'echo "Build failed at line $LINENO; see $SOFTWARE/logs" >&2' ERR
 setup_compiler
 if [[ $app == all ]]; then
-    for target in deps minibwa minimap2 samtools blast salmon; do "$ROOT/scripts/build.sh" "$target"; done
+    for target in deps minibwa minimap2 samtools blast salmon star; do "$ROOT/scripts/build.sh" "$target"; done
     exit 0
 fi
 if [[ $app == deps ]]; then build_dependencies; exit 0; fi
@@ -26,6 +26,7 @@ case $app in
     samtools) archive=samtools-1.24.tar.bz2; version=1.24 ;;
     blast) archive=ncbi-blast-2.17.0+-src.tar.gz; version=2.17.0+ ;;
     salmon) archive=salmon-2.7.0.tar.gz; version=2.7.0 ;;
+    star) archive=STAR-2.7.11b.tar.gz; version=2.7.11b ;;
 esac
 prefix="$SOFTWARE/$app-$version/$ARCH"
 mkdir -p "$prefix/bin"
@@ -86,6 +87,14 @@ case $app in
         install -m755 "$work/target/release/salmon" "$prefix/bin/"
         { rustc --version; cargo --version; printf 'RUSTFLAGS=%s\nNative CFLAGS=%s\n' "$RUSTFLAGS" "$CFLAGS"; sha256sum "$work/Cargo.lock"; } >> "$prefix/build-info.txt"
         "$prefix/bin/salmon" --version
+        ;;
+    star)
+        (cd "$work/source" && make -j "$JOBS" CXX="$CXX" \
+            CXXFLAGSextra="$CXXFLAGS ${EXTRA_CXXFLAGS:-}" CXXFLAGS_SIMD="-mavx2")
+        install -m755 "$work/source/STAR" "$prefix/bin/"
+        install -m755 "$work/source/STARlong" "$prefix/bin/" 2>/dev/null || true
+        install -m644 "$work/LICENSE" "$prefix/"
+        "$prefix/bin/STAR" --version 2>&1 | head -n 2
         ;;
 esac
 printf 'Installed %s in %s\n' "$app" "$prefix"

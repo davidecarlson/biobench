@@ -14,6 +14,7 @@ Hyperfine timing scripts.
 | SAMtools | 1.24 | Alignment-file processing | GCC |
 | NCBI BLAST+ | 2.17.0+ | Sequence similarity search | GCC/G++ |
 | Salmon | 2.7.0 | Transcript quantification | Rust, plus GCC for native dependencies |
+| STAR | 2.7.11b | Spliced RNA-seq alignment | GCC/G++ |
 
 ## Build
 
@@ -23,6 +24,8 @@ Run on a Linux x86-64 machine with enough CPU, RAM, and storage:
 ./scripts/build.sh all
 # Build a single application:
 ./scripts/build.sh blast
+# Build STAR:
+./scripts/build.sh star
 # Choose parallelism and the benchmark CPU explicitly:
 JOBS=32 ARCH=skylake-avx512 ./scripts/build.sh all
 ```
@@ -73,6 +76,7 @@ MAX_THREADS=192 ./scripts/benchmark-minimap2.sh
 MAX_THREADS=192 sbatch scripts/benchmark-minimap2.slurm
 # Optional scaling sequence: 1,2,4,8,16,24,...,MAX_THREADS
 THREAD_MODE=scaling MAX_THREADS=64 ./scripts/benchmark-minimap2.sh
+MAX_THREADS=192 ./scripts/benchmark-star.sh
 ```
 
 When `ARCH` is unset, each runner uses `native` if installed or the only other
@@ -131,6 +135,7 @@ ARCH=skylake-avx512 ./scripts/smoke-test.sh
 
 The checks exercise minibwa/minimap2 mapping, SAMtools BAM conversion and
 validation, BLAST database creation/search, and Salmon indexing/quantification.
+STAR is version-checked during its build and has a separate benchmark runner.
 Synthetic inputs and results remain in `software/smoke.*`. SAMtools also runs
 its upstream test suite during its build.
 

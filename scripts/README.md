@@ -4,10 +4,10 @@ See the [repository README](../README.md) for the quick start and dataset layout
 
 ## Entry points
 
-- `build.sh {all|deps|minibwa|minimap2|samtools|blast|salmon}`: build/install.
+- `build.sh {all|deps|minibwa|minimap2|samtools|blast|salmon|star}`: build/install.
 - `fetch-salmon-dependencies.sh`: install private Rust tooling and fetch the
   supplied lockfile's Linux dependencies without compiling Salmon.
-- `smoke-test.sh`: functional checks of all five installed applications.
+- `smoke-test.sh`: functional checks of minibwa, minimap2, SAMtools, BLAST, and Salmon.
 - `common.sh`, `dependencies.sh`: shared helpers sourced by the entry points.
 
 Benchmark runners are named `benchmark-APP.sh`; matching `.slurm` files submit
