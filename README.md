@@ -94,6 +94,12 @@ CSV, and Markdown results plus `best.txt`, which records the thread count with
 the lowest mean time. Adjust the Slurm resource directives for the target
 cluster.
 
+Compare all completed thread-count jobs with:
+
+```bash
+./scripts/summarize-benchmark.sh minimap2 clearwaterforest
+```
+
 ## Repository layout
 
 ```text

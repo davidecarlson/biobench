@@ -44,6 +44,13 @@ Single-thread jobs write to `results/APP/ARCH/threads-N/`, so separate Slurm
 jobs cannot overwrite one another. A direct runner with several thread values
 continues to write the combined result files in `results/APP/ARCH/`.
 
+Run `summarize-benchmark.sh APP [ARCH]` to scan all result files and report the
+lowest average time and its thread count:
+
+```bash
+./scripts/summarize-benchmark.sh minimap2 clearwaterforest
+```
+
 Scripts run from the current shell. They find source archives in the repository's
 `src` directory regardless of the caller's working directory.
 
