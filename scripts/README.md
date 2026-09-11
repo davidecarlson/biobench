@@ -70,7 +70,9 @@ optimization settings. Install any system development packages reported by the
 checks when moving to another system.
 
 The curl dependency disables symbol hiding because some newer binutils toolchains
-produce an empty libtool symbol pipeline otherwise. SAMtools builds its bundled
+produce an empty libtool symbol pipeline otherwise. libdeflate keeps the selected
+CPU flags but disables GCC LTO because older assemblers can reject instructions
+from LTO-generated temporary assembly. SAMtools builds its bundled
 HTSlib with libcurl and libdeflate. Minibwa's bundled
 mimalloc is explicitly compiled with the selected optimization flags because its
 Makefile otherwise hard-codes that object's flags. BLAST uses its bundled LMDB

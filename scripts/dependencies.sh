@@ -26,9 +26,13 @@ build_dependencies() {
         fetch libdeflate-1.25.tar.gz https://github.com/ebiggers/libdeflate/releases/download/v1.25/libdeflate-1.25.tar.gz
         work=$(mktemp -d "$BUILD/libdeflate.XXXXXX")
         extract libdeflate-1.25.tar.gz "$work"
+        # Keep libdeflate out of GCC LTO: some system assemblers reject
+        # instructions emitted by the LTO-generated temporary assembly.
+        local libdeflate_cflags=${CFLAGS//-flto=$JOBS/}
         cmake -S "$work" -B "$work/build" -DCMAKE_INSTALL_PREFIX="$DEPS" \
             -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_BUILD_TYPE=Release \
-            -DCMAKE_C_COMPILER="$CC" -DCMAKE_C_FLAGS_RELEASE="$CFLAGS" \
+            -DCMAKE_C_COMPILER="$CC" -DCMAKE_C_FLAGS_RELEASE="$libdeflate_cflags" \
+            -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=OFF \
             -DCMAKE_POSITION_INDEPENDENT_CODE=ON
         cmake --build "$work/build" --parallel "$JOBS"
         cmake --install "$work/build"
