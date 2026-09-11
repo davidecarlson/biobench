@@ -17,7 +17,8 @@ the same runner through Slurm. They use Hyperfine with a default sequence of
 `THREADS` with a comma-separated list when needed. Set `MAX_THREADS`, `ARCH`,
 `RUNS`, `WARMUP`, `RESULTS_DIR`, or `BENCH_WORK`. `install-hyperfine.sh` installs
 Hyperfine 1.19.0 with Cargo when it is not already on `PATH`. Timing results
-are written as JSON and Markdown under `results/`.
+are written as JSON, CSV, and Markdown under `results/`; `best.txt` identifies
+the thread count with the lowest mean time.
 
 If `ARCH` is unset, a runner selects `native` when available or the sole other
 installed architecture. Set `ARCH` explicitly when several architectures are

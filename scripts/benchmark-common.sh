@@ -48,8 +48,22 @@ run_hyperfine() {
     ensure_hyperfine
     hyperfine --shell bash --warmup "$WARMUP" --runs "$RUNS" \
         --parameter-list threads "$THREADS" --export-json "$result_dir/hyperfine.json" \
-        --export-markdown "$result_dir/hyperfine.md" --command-name "$app" "$command_line"
-    printf 'Results: %s\n' "$result_dir/hyperfine.json"
+        --export-csv "$result_dir/hyperfine.csv" --export-markdown "$result_dir/hyperfine.md" \
+        --command-name "$app" "$command_line"
+    python3 - "$result_dir/hyperfine.json" "$result_dir/best.txt" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], encoding="utf-8") as stream:
+    results = json.load(stream)["results"]
+best = min(results, key=lambda item: item["mean"])
+with open(sys.argv[2], "w", encoding="utf-8") as stream:
+    stream.write(f"mean_seconds={best['mean']:.9g}\n")
+    for name, value in best.get("parameters", {}).items():
+        stream.write(f"{name}={value}\n")
+    stream.write(f"command={best['command']}\n")
+PY
+    printf 'Results: %s\nBest run: %s\n' "$result_dir/hyperfine.json" "$result_dir/best.txt"
 }
 
 require_file() { [ -r "$1" ] || { echo "Missing input: $1" >&2; return 1; }; }

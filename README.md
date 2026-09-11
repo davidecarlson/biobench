@@ -88,8 +88,10 @@ as an advanced override. Set `RUNS`, `WARMUP`, `RESULTS_DIR`, or `BENCH_WORK`
 as needed. Results are JSON
 and Markdown files under `results/APP/ARCH/`; reusable indexes are under
 `results/work/`. Hyperfine is used from `PATH`, or installed with
-`scripts/install-hyperfine.sh` under `software/hyperfine`. Adjust the Slurm
-resource directives for the target cluster.
+`scripts/install-hyperfine.sh` under `software/hyperfine`. Each run writes JSON,
+CSV, and Markdown results plus `best.txt`, which records the thread count with
+the lowest mean time. Adjust the Slurm resource directives for the target
+cluster.
 
 ## Repository layout
 
