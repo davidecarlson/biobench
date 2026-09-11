@@ -71,9 +71,9 @@ checks when moving to another system.
 
 The curl dependency disables symbol hiding because some newer binutils toolchains
 produce an empty libtool symbol pipeline otherwise. libdeflate keeps the selected
-CPU flags but disables GCC LTO and probes VNNI support with those flags. If the
-assembler rejects VNNI instructions, the script enables libdeflate's fallback
-implementations. SAMtools builds its bundled
+CPU flags but disables GCC LTO and forces its documented VNNI fallback
+implementations because the available assembler rejects `vpdpbusd`. SAMtools
+builds its bundled
 HTSlib with libcurl and libdeflate. Minibwa's bundled
 mimalloc is explicitly compiled with the selected optimization flags because its
 Makefile otherwise hard-codes that object's flags. BLAST uses its bundled LMDB

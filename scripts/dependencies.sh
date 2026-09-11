@@ -31,14 +31,11 @@ build_dependencies() {
         local libdeflate_cflags libdeflate_ldflags
         libdeflate_cflags=$(printf '%s\n' "$CFLAGS" | sed -E 's/(^|[[:space:]])-flto(=[^[:space:]]+)?//g')
         libdeflate_ldflags=$(printf '%s\n' "$LDFLAGS" | sed -E 's/(^|[[:space:]])-flto(=[^[:space:]]+)?//g')
-        # libdeflate's CMake probe does not include CMAKE_C_FLAGS, so test the
-        # selected target explicitly and force its documented fallback macros.
-        if ! printf 'vpdpbusd %%zmm0, %%zmm0, %%zmm0\n' | "$CC" $libdeflate_cflags -c -x assembler -o "$work/avx512vnni.o" - >/dev/null 2>&1; then
-            libdeflate_cflags+=" -DLIBDEFLATE_ASSEMBLER_DOES_NOT_SUPPORT_AVX512VNNI"
-        fi
-        if ! printf '{vex} vpdpbusd %%ymm0, %%ymm0, %%ymm0\n' | "$CC" $libdeflate_cflags -c -x assembler -o "$work/avxvnni.o" - >/dev/null 2>&1; then
-            libdeflate_cflags+=" -DLIBDEFLATE_ASSEMBLER_DOES_NOT_SUPPORT_AVX_VNNI"
-        fi
+        # The paired assembler may accept standalone probes but reject VNNI
+        # emitted by GCC's target-specific intrinsics. Force libdeflate's
+        # documented fallbacks so vpdpbusd is never assembled here.
+        libdeflate_cflags+=" -DLIBDEFLATE_ASSEMBLER_DOES_NOT_SUPPORT_AVX512VNNI"
+        libdeflate_cflags+=" -DLIBDEFLATE_ASSEMBLER_DOES_NOT_SUPPORT_AVX_VNNI"
         CFLAGS="$libdeflate_cflags" LDFLAGS="$libdeflate_ldflags" \
         cmake -S "$work" -B "$work/build" -DCMAKE_INSTALL_PREFIX="$DEPS" \
             -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_BUILD_TYPE=Release \
