@@ -44,6 +44,9 @@ ensure_hyperfine() {
 
 run_hyperfine() {
     local app=$1 command_line=$2 result_dir="$RESULTS_DIR/$1/$ARCH"
+    if [[ $THREADS != *,* ]]; then
+        result_dir+="/threads-$THREADS"
+    fi
     mkdir -p "$result_dir"
     ensure_hyperfine
     hyperfine --shell bash --warmup "$WARMUP" --runs "$RUNS" \

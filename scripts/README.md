@@ -40,6 +40,10 @@ the matching `cpus-per-task` value for each job. A cluster configured for
 whole-node allocation may still show more allocated CPUs than requested; check
 `ReqTRES` and `CPUs/Task` for the actual request.
 
+Single-thread jobs write to `results/APP/ARCH/threads-N/`, so separate Slurm
+jobs cannot overwrite one another. A direct runner with several thread values
+continues to write the combined result files in `results/APP/ARCH/`.
+
 Scripts run from the current shell. They find source archives in the repository's
 `src` directory regardless of the caller's working directory.
 
