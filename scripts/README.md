@@ -10,8 +10,9 @@ See the [repository README](../README.md) for the quick start and dataset layout
 - `smoke-test.sh`: functional checks of minibwa, minimap2, SAMtools, BLAST, and Salmon.
 - `common.sh`, `dependencies.sh`: shared helpers sourced by the entry points.
 
-Benchmark runners are named `benchmark-APP.sh`; matching `.slurm` files submit
-the same runner through Slurm. They use Hyperfine with a default sequence of
+Benchmark runners are named `benchmark-APP.sh`; matching `.slurm` files run one
+thread count through Slurm. Use `submit-benchmark.sh` to submit a separate job
+for every generated count. The runners use Hyperfine with a default sequence of
 8-thread increments from 8 through `MAX_THREADS` (192 by default). Set
 `THREAD_MODE=scaling` for 1, 2, 4, then 8-thread increments. Override
 `THREADS` with a comma-separated list when needed. Set `MAX_THREADS`, `ARCH`,
