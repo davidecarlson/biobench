@@ -24,6 +24,18 @@ If `ARCH` is unset, a runner selects `native` when available or the sole other
 installed architecture. Set `ARCH` explicitly when several architectures are
 installed.
 
+Use `submit-benchmark.sh APP` to submit one Slurm job per generated thread
+count. Additional arguments are passed to `sbatch`:
+
+```bash
+MAX_THREADS=192 ./scripts/submit-benchmark.sh star --partition=compute
+THREAD_MODE=scaling MAX_THREADS=64 ./scripts/submit-benchmark.sh salmon
+```
+
+Each job receives one value through `THREADS`, so Hyperfine measures that value
+using the configured `RUNS` and `WARMUP`. Shared indexes and databases use a
+filesystem lock during first creation.
+
 Scripts run from the current shell. They find source archives in the repository's
 `src` directory regardless of the caller's working directory.
 

@@ -77,6 +77,8 @@ MAX_THREADS=192 sbatch scripts/benchmark-minimap2.slurm
 # Optional scaling sequence: 1,2,4,8,16,24,...,MAX_THREADS
 THREAD_MODE=scaling MAX_THREADS=64 ./scripts/benchmark-minimap2.sh
 MAX_THREADS=192 ./scripts/benchmark-star.sh
+# Submit one Slurm job per generated thread count.
+MAX_THREADS=192 ./scripts/submit-benchmark.sh minimap2
 ```
 
 When `ARCH` is unset, each runner uses `native` if installed or the only other

@@ -68,6 +68,17 @@ PY
 
 require_file() { [ -r "$1" ] || { echo "Missing input: $1" >&2; return 1; }; }
 
+prepare_once() {
+    local marker=$1 lock="$1.lock"
+    shift
+    [ -e "$marker" ] && return
+    while ! mkdir "$lock" 2>/dev/null; do sleep 5; done
+    if [ ! -e "$marker" ]; then
+        if ! "$@"; then rmdir "$lock"; return 1; fi
+    fi
+    rmdir "$lock"
+}
+
 select_arch() {
     local app=$1 version=$2 executable=$3 root="$SOFTWARE/$1-$2" candidate
     if [ -n "$ARCH" ]; then return; fi
