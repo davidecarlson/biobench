@@ -12,6 +12,7 @@ source "$ROOT/scripts/benchmark-common.sh"
 
 for thread_count in ${THREADS//,/ }; do
     job_id=$(sbatch --parsable --job-name="bench-$app-$thread_count" \
+        --ntasks=1 --cpus-per-task="$thread_count" \
         --export="ALL,THREADS=$thread_count" "$@" "$ROOT/scripts/benchmark-$app.slurm")
     printf '%s\t%s\t%s\n' "$job_id" "$app" "$thread_count"
 done

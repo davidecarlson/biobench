@@ -35,7 +35,10 @@ THREAD_MODE=scaling MAX_THREADS=64 ./scripts/submit-benchmark.sh salmon
 
 Each job receives one value through `THREADS`, so Hyperfine measures that value
 using the configured `RUNS` and `WARMUP`. Shared indexes and databases use a
-filesystem lock during first creation.
+filesystem lock during first creation. The submitter also requests one task and
+the matching `cpus-per-task` value for each job. A cluster configured for
+whole-node allocation may still show more allocated CPUs than requested; check
+`ReqTRES` and `CPUs/Task` for the actual request.
 
 Scripts run from the current shell. They find source archives in the repository's
 `src` directory regardless of the caller's working directory.
