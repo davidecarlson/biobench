@@ -28,10 +28,15 @@ build_dependencies() {
         extract libdeflate-1.25.tar.gz "$work"
         # Keep libdeflate out of GCC LTO: some system assemblers reject
         # instructions emitted by the LTO-generated temporary assembly.
-        local libdeflate_cflags=${CFLAGS//-flto=$JOBS/}
+        local libdeflate_cflags libdeflate_ldflags
+        libdeflate_cflags=$(printf '%s\n' "$CFLAGS" | sed -E 's/(^|[[:space:]])-flto(=[^[:space:]]+)?//g')
+        libdeflate_ldflags=$(printf '%s\n' "$LDFLAGS" | sed -E 's/(^|[[:space:]])-flto(=[^[:space:]]+)?//g')
+        CFLAGS="$libdeflate_cflags" LDFLAGS="$libdeflate_ldflags" \
         cmake -S "$work" -B "$work/build" -DCMAKE_INSTALL_PREFIX="$DEPS" \
             -DCMAKE_INSTALL_LIBDIR=lib -DCMAKE_BUILD_TYPE=Release \
             -DCMAKE_C_COMPILER="$CC" -DCMAKE_C_FLAGS_RELEASE="$libdeflate_cflags" \
+            -DCMAKE_C_FLAGS="$libdeflate_cflags" -DCMAKE_EXE_LINKER_FLAGS="$libdeflate_ldflags" \
+            -DCMAKE_SHARED_LINKER_FLAGS="$libdeflate_ldflags" \
             -DCMAKE_INTERPROCEDURAL_OPTIMIZATION=OFF \
             -DCMAKE_POSITION_INDEPENDENT_CODE=ON
         cmake --build "$work/build" --parallel "$JOBS"
