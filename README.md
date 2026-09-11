@@ -75,10 +75,12 @@ MAX_THREADS=192 sbatch scripts/benchmark-minimap2.slurm
 THREAD_MODE=scaling MAX_THREADS=64 ./scripts/benchmark-minimap2.sh
 ```
 
-The default sequence starts at 8 threads and increases by 8 through
-`MAX_THREADS` (192 by default). Set `THREAD_MODE=scaling` to use 1, 2, 4, then
-8-thread increments. You can set `THREADS` to a comma-separated list as an
-advanced override. Set `ARCH`, `RUNS`, `WARMUP`, `RESULTS_DIR`, or `BENCH_WORK`
+When `ARCH` is unset, each runner uses `native` if installed or the only other
+installed architecture. Set `ARCH` explicitly when more than one architecture
+is installed. The default sequence starts at 8 threads and increases by 8
+through `MAX_THREADS` (192 by default). Set `THREAD_MODE=scaling` to use 1, 2,
+4, then 8-thread increments. You can set `THREADS` to a comma-separated list
+as an advanced override. Set `RUNS`, `WARMUP`, `RESULTS_DIR`, or `BENCH_WORK`
 as needed. Results are JSON
 and Markdown files under `results/APP/ARCH/`; reusable indexes are under
 `results/work/`. Hyperfine is used from `PATH`, or installed with

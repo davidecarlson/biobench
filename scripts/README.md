@@ -19,6 +19,10 @@ the same runner through Slurm. They use Hyperfine with a default sequence of
 Hyperfine 1.19.0 with Cargo when it is not already on `PATH`. Timing results
 are written as JSON and Markdown under `results/`.
 
+If `ARCH` is unset, a runner selects `native` when available or the sole other
+installed architecture. Set `ARCH` explicitly when several architectures are
+installed.
+
 Scripts run from the current shell. They find source archives in the repository's
 `src` directory regardless of the caller's working directory.
 

@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
-ARCH=${ARCH:-native}
+ARCH=${ARCH:-}
 SOFTWARE=${SOFTWARE:-$ROOT/software}
 DATA=${DATA:-$ROOT/data}
 RESULTS_DIR=${RESULTS_DIR:-$ROOT/results}
@@ -53,3 +53,22 @@ run_hyperfine() {
 }
 
 require_file() { [ -r "$1" ] || { echo "Missing input: $1" >&2; return 1; }; }
+
+select_arch() {
+    local app=$1 version=$2 executable=$3 root="$SOFTWARE/$1-$2" candidate
+    if [ -n "$ARCH" ]; then return; fi
+    if [ -x "$root/native/bin/$executable" ]; then
+        ARCH=native
+        return
+    fi
+    local candidates=("$root"/*/bin/"$executable")
+    if [ "${#candidates[@]}" -eq 1 ] && [ -x "${candidates[0]}" ]; then
+        candidate=${candidates[0]}
+        ARCH=$(basename "$(dirname "$(dirname "$candidate")")")
+        return
+    fi
+    echo "Set ARCH; could not uniquely select an installed $app architecture under $root" >&2
+    printf 'Candidates:\n' >&2
+    printf '  %s\n' "${candidates[@]}" >&2
+    return 1
+}
