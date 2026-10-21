@@ -18,9 +18,23 @@ build_dependencies() {
         fetch sqlite-autoconf-3500400.tar.gz https://sqlite.org/2025/sqlite-autoconf-3500400.tar.gz
         work=$(mktemp -d "$BUILD/sqlite.XXXXXX")
         extract sqlite-autoconf-3500400.tar.gz "$work"
-        (cd "$work" && CFLAGS="$CFLAGS -DSQLITE_ENABLE_UNLOCK_NOTIFY" \
+        # SQLite's amalgamation can emit instructions that the host assembler
+        # rejects instructions emitted by GCC's native target, especially in
+        # LTO-generated assembly. Build this dependency with generic -O3 flags;
+        # application builds retain their selected CPU tuning.
+        local sqlite_cflags sqlite_ldflags
+        sqlite_cflags=$(printf '%s\n' "$CFLAGS" | sed -E \
+            's/(^|[[:space:]])-flto(=[^[:space:]]+)?//g; s/(^|[[:space:]])-(march|mtune)=[^[:space:]]+//g')
+        sqlite_ldflags=$(printf '%s\n' "$LDFLAGS" | sed -E \
+            's/(^|[[:space:]])-flto(=[^[:space:]]+)?//g; s/(^|[[:space:]])-(march|mtune)=[^[:space:]]+//g')
+        (cd "$work" && CFLAGS="$sqlite_cflags -DSQLITE_ENABLE_UNLOCK_NOTIFY" \
+            CXXFLAGS="$sqlite_cflags" \
+            LDFLAGS="$sqlite_ldflags" \
             ./configure --prefix="$DEPS" --libdir="$DEPS/lib" --disable-readline \
-            && make -j "$JOBS" && make install)
+            && CFLAGS="$sqlite_cflags -DSQLITE_ENABLE_UNLOCK_NOTIFY" \
+               CXXFLAGS="$sqlite_cflags" LDFLAGS="$sqlite_ldflags" \
+               make -j "$JOBS" \
+            && make install)
     fi
     if [[ ! -f $DEPS/lib/pkgconfig/libdeflate.pc ]]; then
         fetch libdeflate-1.25.tar.gz https://github.com/ebiggers/libdeflate/releases/download/v1.25/libdeflate-1.25.tar.gz
