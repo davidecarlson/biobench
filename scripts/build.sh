@@ -4,19 +4,19 @@ set -Eeuo pipefail
 # Flags intentionally undergo word splitting, with glob expansion disabled.
 set -f
 if [[ ${1:-} == --help || $# == 0 ]]; then
-    echo 'Usage: scripts/build.sh {all|deps|minibwa|minimap2|samtools|blast|salmon|star}'
+    echo 'Usage: scripts/build.sh {all|deps|minibwa|minimap2|samtools|blast|kraken2|salmon|star}'
     echo 'Environment: ARCH=native JOBS=8 LTO=1 FAST_MATH=0 GCC_MODULE=gcc/13.2.0'
     exit 0
 fi
 app=$1
-case $app in all|deps|minibwa|minimap2|samtools|blast|salmon|star) ;; *) echo "Unknown application: $app" >&2; exit 2;; esac
+case $app in all|deps|minibwa|minimap2|samtools|blast|kraken2|salmon|star) ;; *) echo "Unknown application: $app" >&2; exit 2;; esac
 source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 source "$ROOT/scripts/dependencies.sh"
 exec > >(tee "$SOFTWARE/logs/$app-$(date +%Y%m%dT%H%M%S)-$$.log") 2>&1
 trap 'echo "Build failed at line $LINENO; see $SOFTWARE/logs" >&2' ERR
 setup_compiler
 if [[ $app == all ]]; then
-    for target in deps minibwa minimap2 samtools blast salmon star; do "$ROOT/scripts/build.sh" "$target"; done
+    for target in deps minibwa minimap2 samtools blast kraken2 salmon star; do "$ROOT/scripts/build.sh" "$target"; done
     exit 0
 fi
 if [[ $app == deps ]]; then build_dependencies; exit 0; fi
@@ -25,6 +25,7 @@ case $app in
     minimap2) archive=minimap2-2.31.tar.gz; version=2.31 ;;
     samtools) archive=samtools-1.24.tar.bz2; version=1.24 ;;
     blast) archive=ncbi-blast-2.17.0+-src.tar.gz; version=2.17.0+ ;;
+    kraken2) archive=kraken2-2.18.0-RC1.tar.gz; version=2.18.0-RC1 ;;
     salmon) archive=salmon-2.7.0.tar.gz; version=2.7.0 ;;
     star) archive=STAR-2.7.11b.tar.gz; version=2.7.11b ;;
 esac
@@ -75,6 +76,16 @@ case $app in
         cp -a "$work/c++/ReleaseMT/bin/." "$prefix/bin/"
         "$prefix/bin/blastn" -version
         "$prefix/bin/makeblastdb" -version
+        ;;
+    kraken2)
+        # The upstream installer places executables and support scripts in one
+        # directory.  Install that directory below bin so it matches the other
+        # applications in this repository.
+        (cd "$work" && make -C src -j "$JOBS" CXX="$CXX" CC="$CC" \
+            CXXFLAGS="$CXXFLAGS -fopenmp -std=c++17 -fPIC -DLINEAR_PROBING" \
+            CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS -fopenmp" \
+            && ./install_kraken2.sh "$prefix/bin")
+        "$prefix/bin/kraken2" --version
         ;;
     salmon)
         setup_rust

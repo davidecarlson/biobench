@@ -5,8 +5,8 @@ ROOT=$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)
 app=${1:-}
 shift || true
 case "$app" in
-    minibwa|minimap2|samtools|blast|salmon|star) ;;
-    *) echo "Usage: $0 {minibwa|minimap2|samtools|blast|salmon|star} [sbatch options]" >&2; exit 2 ;;
+    minibwa|minimap2|samtools|blast|kraken2|salmon|star) ;;
+    *) echo "Usage: $0 {minibwa|minimap2|samtools|blast|kraken2|salmon|star} [sbatch options]" >&2; exit 2 ;;
 esac
 source "$ROOT/scripts/benchmark-common.sh"
 

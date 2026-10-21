@@ -13,6 +13,7 @@ Hyperfine timing scripts.
 | minimap2 | 2.31 | Read alignment | GCC |
 | SAMtools | 1.24 | Alignment-file processing | GCC |
 | NCBI BLAST+ | 2.17.0+ | Sequence similarity search | GCC/G++ |
+| Kraken2 | 2.18.0-RC1 | Paired-read taxonomic classification | GCC/G++ |
 | Salmon | 2.7.0 | Transcript quantification | Rust, plus GCC for native dependencies |
 | STAR | 2.7.11b | Spliced RNA-seq alignment | GCC/G++ |
 
@@ -26,6 +27,8 @@ Run on a Linux x86-64 machine with enough CPU, RAM, and storage:
 ./scripts/build.sh blast
 # Build STAR:
 ./scripts/build.sh star
+# Build Kraken2:
+./scripts/build.sh kraken2
 # Choose parallelism and the benchmark CPU explicitly:
 JOBS=32 ARCH=skylake-avx512 ./scripts/build.sh all
 ```
@@ -78,6 +81,10 @@ MAX_THREADS=192 ./scripts/submit-benchmark.sh minimap2
 # Optional scaling sequence: 1,2,4,8,16,24,...,MAX_THREADS
 THREAD_MODE=scaling MAX_THREADS=64 ./scripts/benchmark-minimap2.sh
 MAX_THREADS=192 ./scripts/benchmark-star.sh
+# Kraken2 requires a prepared database; it is intentionally not downloaded by the benchmark.
+KRAKEN2_DB=/path/to/kraken2-db MAX_THREADS=192 ./scripts/benchmark-kraken2.sh
+# Submit one Kraken2 Slurm job per thread count:
+KRAKEN2_DB=/path/to/kraken2-db MAX_THREADS=192 ./scripts/submit-benchmark.sh kraken2
 ```
 
 When `ARCH` is unset, each runner uses `native` if installed or the only other
@@ -130,8 +137,11 @@ archives in `src` when removing intermediate build trees.
 - `data/bam/`: HG002 PacBio CCS alignments.
 - `data/blast/`: GENCODE v46 transcript and protein sequence subsets.
 
-Inputs are supplied separately. Generate reference indexes and BLAST/Salmon
-databases with the relevant application before timing workloads. The smoke tests
+Inputs are supplied separately. Generate reference indexes, BLAST/Salmon
+databases, and a Kraken2 database with the relevant application before timing
+workloads. Set `KRAKEN2_DB` to that database directory before running the
+Kraken2 benchmark; the database is large and is not stored in this repository.
+The smoke tests
 use small synthetic inputs and leave these datasets unchanged.
 
 ## Validate

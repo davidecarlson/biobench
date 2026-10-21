@@ -4,7 +4,7 @@ See the [repository README](../README.md) for the quick start and dataset layout
 
 ## Entry points
 
-- `build.sh {all|deps|minibwa|minimap2|samtools|blast|salmon|star}`: build/install.
+- `build.sh {all|deps|minibwa|minimap2|samtools|blast|kraken2|salmon|star}`: build/install.
 - `fetch-salmon-dependencies.sh`: install private Rust tooling and fetch the
   supplied lockfile's Linux dependencies without compiling Salmon.
 - `smoke-test.sh`: functional checks of minibwa, minimap2, SAMtools, BLAST, and Salmon.
@@ -24,6 +24,15 @@ the thread count with the lowest mean time.
 If `ARCH` is unset, a runner selects `native` when available or the sole other
 installed architecture. Set `ARCH` explicitly when several architectures are
 installed.
+
+The Kraken2 runner uses the paired HG002 short-read files and requires a
+prepared Kraken2 database supplied with `KRAKEN2_DB`. The database is not
+downloaded or stored by this repository because standard databases are large:
+
+```bash
+KRAKEN2_DB=/path/to/kraken2-db MAX_THREADS=192 ./scripts/benchmark-kraken2.sh
+KRAKEN2_DB=/path/to/kraken2-db MAX_THREADS=192 ./scripts/submit-benchmark.sh kraken2
+```
 
 Use `submit-benchmark.sh APP` to submit one Slurm job per generated thread
 count. Additional arguments are passed to `sbatch`:
