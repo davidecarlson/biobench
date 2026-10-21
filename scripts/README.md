@@ -96,12 +96,15 @@ The copied Cargo cache must contain every locked package required by Salmon.
 
 | Dependency | Pinned source |
 | --- | --- |
+| OpenSSL 3.0.22 | https://github.com/openssl/openssl/releases/download/openssl-3.0.22/openssl-3.0.22.tar.gz |
 | libdeflate 1.25 | https://github.com/ebiggers/libdeflate/releases/download/v1.25/libdeflate-1.25.tar.gz |
 | curl 8.19.0 | https://curl.se/download/curl-8.19.0.tar.xz |
 | SQLite 3.50.4 | https://sqlite.org/2025/sqlite-autoconf-3500400.tar.gz |
 
 Downloads use HTTPS and temporary files. Checksums detect changes to cached
-archives. Existing dependency installations are reused. Remove the relevant
+archives. OpenSSL 3.0.22 is built privately under `software/deps/ARCH/openssl`
+so curl and SAMtools do not depend on the host OpenSSL version. Set
+`OPENSSL_ROOT` to reuse another OpenSSL 3 installation. Existing dependency installations are reused. Remove the relevant
 `software/deps/ARCH` prefix before rebuilding with different compiler or
 optimization settings. Install any system development packages reported by the
 checks when moving to another system.

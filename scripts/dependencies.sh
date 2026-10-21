@@ -3,10 +3,39 @@
 # Compiler flags intentionally split; common.sh disables glob expansion.
 # shellcheck disable=SC2086
 build_dependencies() {
-    # System zlib, bzip2, xz, OpenSSL and curses development packages are present
-    # on this cluster. Check with the selected compiler, not only package metadata.
+    # Build a private OpenSSL 3 fallback. The ACCESS systems used for these
+    # builds commonly provide OpenSSL 1.1, which current curl releases reject.
+    local openssl_prefix=${OPENSSL_ROOT:-$DEPS/openssl}
+    if [[ -z ${OPENSSL_ROOT:-} && ! -f $openssl_prefix/lib/libssl.a ]]; then
+        fetch openssl-3.0.22.tar.gz https://github.com/openssl/openssl/releases/download/openssl-3.0.22/openssl-3.0.22.tar.gz
+        local openssl_work openssl_cflags openssl_ldflags
+        openssl_work=$(mktemp -d "$BUILD/openssl.XXXXXX")
+        extract openssl-3.0.22.tar.gz "$openssl_work"
+        openssl_cflags=$(printf '%s\n' "$CFLAGS" | sed -E \
+            's/(^|[[:space:]])-flto(=[^[:space:]]+)?//g; s/(^|[[:space:]])-(march|mtune)=[^[:space:]]+//g')
+        openssl_ldflags=$(printf '%s\n' "$LDFLAGS" | sed -E \
+            's/(^|[[:space:]])-flto(=[^[:space:]]+)?//g; s/(^|[[:space:]])-(march|mtune)=[^[:space:]]+//g')
+        (cd "$openssl_work" && CFLAGS="$openssl_cflags" LDFLAGS="$openssl_ldflags" \
+            ./Configure --prefix="$openssl_prefix" \
+            --openssldir="$openssl_prefix/ssl" --libdir=lib no-shared no-tests \
+            && CFLAGS="$openssl_cflags" LDFLAGS="$openssl_ldflags" make -j "$JOBS" \
+            && make install_sw)
+    fi
+    [[ -f $openssl_prefix/lib/libssl.a || -f $openssl_prefix/lib64/libssl.a ]] || {
+        echo "OpenSSL 3 installation not found under $openssl_prefix; set OPENSSL_ROOT or check the private build" >&2
+        return 1
+    }
+    local openssl_lib=$openssl_prefix/lib
+    [[ -d $openssl_lib ]] || openssl_lib=$openssl_prefix/lib64
+    export OPENSSL_ROOT="$openssl_prefix"
+    CPPFLAGS="-I$OPENSSL_ROOT/include $CPPFLAGS"
+    LDFLAGS="-L$openssl_lib -Wl,-rpath,$openssl_lib $LDFLAGS"
+    PKG_CONFIG_PATH="$openssl_lib/pkgconfig:${PKG_CONFIG_PATH:-}"
+    export CPPFLAGS LDFLAGS PKG_CONFIG_PATH
+
+    # Check headers and libraries with the selected compiler, not only package metadata.
     local header lib
-    for pair in zlib.h:z bzlib.h:bz2 lzma.h:lzma openssl/ssl.h:ssl curses.h:ncurses; do
+    for pair in zlib.h:z bzlib.h:bz2 lzma.h:lzma curses.h:ncurses; do
         header=${pair%:*}; lib=${pair#*:}
         printf '#include <%s>\nint main(void){return 0;}\n' "$header" |
             "$CC" $CPPFLAGS -x c - -o "$BUILD/dependency-check" $LDFLAGS -l"$lib" || {

@@ -59,8 +59,10 @@ BUILD_ROOT=/fast/local/biobench JOBS=32 ./scripts/build.sh all
 
 Build prerequisites include Bash, GNU make, GCC/G++, Python 3, CMake, curl, tar,
 and development libraries for zlib, bzip2, xz/liblzma, OpenSSL, and ncurses.
-The scripts download missing libcurl, libdeflate, and SQLite sources into `src`
-and build them under `software/deps/ARCH`. They also install Salmon's private
+The scripts download missing OpenSSL 3, libcurl, libdeflate, and SQLite sources
+into `src` and build them under `software/deps/ARCH`. OpenSSL 3 is built
+privately so the host's older OpenSSL does not block curl or SAMtools. Set
+`OPENSSL_ROOT` to use an existing OpenSSL 3 installation. They also install Salmon's private
 Rust toolchain and fetch its locked Cargo dependencies. The first build needs
 network access. If Rust downloads are blocked, copy a compatible Rust
 installation and Cargo cache onto the host and set
