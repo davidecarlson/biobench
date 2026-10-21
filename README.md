@@ -81,8 +81,8 @@ MAX_THREADS=192 ./scripts/submit-benchmark.sh minimap2
 # Optional scaling sequence: 1,2,4,8,16,24,...,MAX_THREADS
 THREAD_MODE=scaling MAX_THREADS=64 ./scripts/benchmark-minimap2.sh
 MAX_THREADS=192 ./scripts/benchmark-star.sh
-# Kraken2 requires a prepared database; it is intentionally not downloaded by the benchmark.
-KRAKEN2_DB=/path/to/kraken2-db MAX_THREADS=192 ./scripts/benchmark-kraken2.sh
+# Kraken2 downloads the standard-8 database on first use (or use KRAKEN2_DB for a local copy).
+MAX_THREADS=192 ./scripts/benchmark-kraken2.sh
 # Submit one Kraken2 Slurm job per thread count:
 KRAKEN2_DB=/path/to/kraken2-db MAX_THREADS=192 ./scripts/submit-benchmark.sh kraken2
 ```
@@ -138,10 +138,10 @@ archives in `src` when removing intermediate build trees.
 - `data/blast/`: GENCODE v46 transcript and protein sequence subsets.
 
 Inputs are supplied separately. Generate reference indexes, BLAST/Salmon
-databases, and a Kraken2 database with the relevant application before timing
-workloads. Set `KRAKEN2_DB` to that database directory before running the
-Kraken2 benchmark; the database is large and is not stored in this repository.
-The smoke tests
+databases with the relevant application before timing workloads. The Kraken2
+benchmark downloads the standard-8 database into `data/kraken2/` on first use;
+set `KRAKEN2_DB` to an existing database directory to override this behavior.
+The database is large and is not stored in this repository. The smoke tests
 use small synthetic inputs and leave these datasets unchanged.
 
 ## Validate

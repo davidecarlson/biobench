@@ -25,12 +25,12 @@ If `ARCH` is unset, a runner selects `native` when available or the sole other
 installed architecture. Set `ARCH` explicitly when several architectures are
 installed.
 
-The Kraken2 runner uses the paired HG002 short-read files and requires a
-prepared Kraken2 database supplied with `KRAKEN2_DB`. The database is not
-downloaded or stored by this repository because standard databases are large:
+The Kraken2 runner uses the paired HG002 short-read files and downloads the
+standard-8 database from the official S3 archive on first use. It stores the
+database under `data/kraken2/`; set `KRAKEN2_DB` to use an existing copy:
 
 ```bash
-KRAKEN2_DB=/path/to/kraken2-db MAX_THREADS=192 ./scripts/benchmark-kraken2.sh
+MAX_THREADS=192 ./scripts/benchmark-kraken2.sh
 KRAKEN2_DB=/path/to/kraken2-db MAX_THREADS=192 ./scripts/submit-benchmark.sh kraken2
 ```
 
