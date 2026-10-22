@@ -44,10 +44,10 @@ newer. GCC 13.2.0 was available during validation. Set
 `GCC_MODULE=gcc/13.2.0` to pin the module. Systems without modules use GCC/G++
 from PATH.
 
-The default optimization flags are `-O3 -march=$ARCH -mtune=$ARCH -flto=$JOBS`.
-`LTO=0` disables GCC link-time optimization; `FAST_MATH=1` explicitly enables
-floating-point transformations that can alter numerical results. Fast-math is
-off by default. Salmon uses its Rust release profile with optimization level 3,
+The default optimization flags are `-O3 -march=$ARCH -mtune=$ARCH`; GCC
+link-time optimization is off by default. Set `LTO=1` to add `-flto=$JOBS`.
+`FAST_MATH=1` explicitly enables floating-point transformations that can alter
+numerical results. Fast-math is off by default. Salmon uses its Rust release profile with optimization level 3,
 thin LTO, one codegen unit, and a CPU-specific target. GCC LTO is omitted for its
 native dependencies because Rust uses LLVM bitcode.
 

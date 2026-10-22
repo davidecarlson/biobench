@@ -5,7 +5,7 @@ set -Eeuo pipefail
 set -f
 if [[ ${1:-} == --help || $# == 0 ]]; then
     echo 'Usage: scripts/build.sh {all|deps|minibwa|minimap2|samtools|blast|kraken2|salmon|star}'
-    echo 'Environment: ARCH=native JOBS=8 LTO=1 FAST_MATH=0 GCC_MODULE=gcc/13.2.0'
+    echo 'Environment: ARCH=native JOBS=8 LTO=0 FAST_MATH=0 GCC_MODULE=gcc/13.2.0'
     exit 0
 fi
 app=$1

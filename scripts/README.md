@@ -72,7 +72,7 @@ Scripts run from the current shell. They find source archives in the repository'
 | `JOBS` | `8` | Parallel make/Cargo jobs and GCC LTO workers |
 | `ARCH` | `native` | GCC architecture and installation directory label |
 | `TUNE` | value of ARCH | GCC scheduling/tuning target |
-| `LTO` | `1` | Set to 0 to disable GCC LTO |
+| `LTO` | `0` | Set to 1 to enable GCC LTO |
 | `FAST_MATH` | `0` | Set to 1 to enable fast-math explicitly |
 | `GCC_MODULE` | auto-selected | Pin a GCC module |
 | `SOFTWARE` | repository/software | Installation root |

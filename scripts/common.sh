@@ -42,7 +42,7 @@ setup_compiler() {
     AR=$(command -v gcc-ar); RANLIB=$(command -v gcc-ranlib)
     export CC CXX AR RANLIB
     OPT="-O3 -march=$ARCH -mtune=${TUNE:-$ARCH}"
-    [[ ${LTO:-1} == 0 ]] || OPT+=" -flto=$JOBS"
+    [[ ${LTO:-0} == 0 ]] || OPT+=" -flto=$JOBS"
     [[ ${FAST_MATH:-0} == 0 ]] || OPT+=' -ffast-math'
     export CFLAGS="$OPT" CXXFLAGS="$OPT"
     export CPPFLAGS="-I$DEPS/include ${EXTRA_CPPFLAGS:-}"
