@@ -74,17 +74,26 @@ rebuild behavior.
 
 ## Benchmark
 
-Each application has a direct runner and a Slurm wrapper in `scripts/`:
+Each application has a direct runner and a Slurm wrapper in `scripts/`. Use the
+direct runner on an interactive node or inside an existing allocation. It runs
+Hyperfine in the current shell and tests all requested thread counts in one
+job:
 
 ```bash
 MAX_THREADS=192 ./scripts/benchmark-minimap2.sh
-# Submit one Slurm job per thread count:
-MAX_THREADS=192 ./scripts/submit-benchmark.sh minimap2
 # Optional scaling sequence: 1,2,4,8,16,24,...,MAX_THREADS
 THREAD_MODE=scaling MAX_THREADS=64 ./scripts/benchmark-minimap2.sh
 MAX_THREADS=192 ./scripts/benchmark-star.sh
 # Kraken2 downloads the standard-8 database on first use (or use KRAKEN2_DB for a local copy).
 MAX_THREADS=192 ./scripts/benchmark-kraken2.sh
+```
+
+Use `submit-benchmark.sh` when Slurm should allocate resources. It submits a
+separate job for each thread count and sets `--cpus-per-task` to that count:
+
+```bash
+# Submit one Slurm job per minimap2 thread count:
+MAX_THREADS=192 ./scripts/submit-benchmark.sh minimap2
 # Submit one Kraken2 Slurm job per thread count:
 KRAKEN2_DB=/path/to/kraken2-db MAX_THREADS=192 ./scripts/submit-benchmark.sh kraken2
 ```
